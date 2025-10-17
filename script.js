@@ -1,5 +1,5 @@
 // **Configuration** – Clé API Steam (remplacer par la vôtre si nécessaire)
-const STEAM_API_KEY = "F0E66919C132C91C94BEB21E7D4A0348";  // ⚠️ Insérez ici votre clé API Steam
+const STEAM_API_KEY = "";  // ⚠️ Insérez ici votre clé API Steam
 
 // **Fonction utilitaire** : Construire l'URL de l'API Steam GetPlayerSummaries
 function getPlayerSummariesURL(steamId) {
