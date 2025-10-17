@@ -1,47 +1,157 @@
-:root{
-  --bg: #111214;
-  --panel: #1e1f21;
-  --muted: #9aa0a6;
-  --accent: #ffd369;
-  --card-shadow: 0 6px 20px rgba(0,0,0,0.6);
-  --radius: 12px;
-  font-family: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+/* Style global : thème sombre, texte clair */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #121212;  /* fond sombre */
+  color: #e0e0e0;             /* texte gris clair */
+  font-family: Arial, sans-serif;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:#eee;min-height:100vh}
-.container{max-width:1100px;margin:30px auto;padding:18px;display:grid;grid-auto-rows:min-content;gap:18px}
-.card{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.015)), var(--panel); padding:16px; border-radius:var(--radius); box-shadow:var(--card-shadow)}
-.muted{color:var(--muted)}
-.small{font-size:12px}
-h1{margin:0 0 8px;font-size:20px}
-label{display:block;font-size:13px;margin-top:10px;color:#d6d6d6}
-input{display:block;width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:#eee;margin-top:6px}
-.row{display:flex;gap:10px;align-items:center;margin-top:12px}
-.row-inline{display:flex;gap:8px;align-items:center;font-size:13px}
-.btn{padding:8px 12px;border-radius:8px;border:0;background:rgba(255,255,255,0.03);color:#eee;cursor:pointer}
-.btn.primary{background:var(--accent);color:#111;font-weight:700}
-.hidden{display:none}
 
-/* dashboard */
-.header-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.profile{display:flex;gap:12px;align-items:center}
-.profile img{width:56px;height:56px;border-radius:10px;object-fit:cover;border:2px solid rgba(255,255,255,0.04)}
-.title{font-weight:700}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px}
-.metric{padding:12px;text-align:center}
-.metric-title{font-size:13px;color:var(--muted)}
-.metric-value{margin-top:8px;font-size:20px;color:var(--accent);font-weight:700}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-.weapons-grid{display:flex;gap:10px;flex-wrap:wrap}
-.weapon{flex:1 1 140px;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02)}
-.weapon h4{margin:0;font-size:14px}
-.weapon .muted{margin-top:6px}
+/* Conteneur principal centré avec un peu de largeur max pour grands écrans */
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+}
 
-/* table */
-table{width:100%;border-collapse:collapse}
-thead th{font-size:13px;color:var(--muted);text-align:left;padding:10px;border-bottom:1px solid rgba(255,255,255,0.03)}
-tbody td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.02);font-size:14px}
-@media (max-width:900px){
-  .metrics{grid-template-columns:repeat(2,1fr)}
-  .grid-2{grid-template-columns:1fr}
+/* Titre principal */
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+/* Barre de recherche */
+.search-bar {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.search-bar input {
+  width: 60%;
+  max-width: 300px;
+  padding: 8px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px 0 0 4px;
+}
+.search-bar button {
+  padding: 8px 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  background-color: #1f1f1f;
+  color: #e0e0e0;
+  cursor: pointer;
+}
+.search-bar button:hover {
+  background-color: #333;
+}
+
+/* Section stats (invisible par défaut, affichée après chargement) */
+.stats-section {
+  display: none; /* caché tant qu'aucune donnée n'est chargée */
+  animation: fadeIn 0.5s ease-in;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Profil Steam (avatar + infos) */
+.profile {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+.profile-info h2 {
+  margin: 0;
+  font-size: 1.5em;
+  color: #ffffff;
+}
+.profile-info p {
+  margin: 5px 0 0;
+  color: #aaaaaa;
+}
+
+/* Statistiques globales (Leetify Rating, Winrate, K/D, Matchs) */
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  text-align: center;
+  margin-bottom: 30px;
+}
+.stat {
+  flex: 1 1 40%; /* chaque bloc de stat occupe environ 40% et s'enroule si nécessaire */
+  background-color: #1e1e1e;
+  margin: 10px;
+  padding: 15px;
+  border-radius: 8px;
+}
+.stat h3 {
+  margin-top: 0;
+  font-size: 1.1em;
+  color: #f84982; /* rose Leetify pour les titres, conforme à leur charte #F84982 :contentReference[oaicite:11]{index=11} */
+}
+.stat p {
+  margin: 5px 0 0;
+  font-size: 1.3em;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+/* Tableau des derniers matchs */
+.matches h3 {
+  margin-bottom: 10px;
+}
+#matchesTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+#matchesTable thead {
+  background-color: #2c2c2c;
+}
+#matchesTable th, #matchesTable td {
+  padding: 8px;
+  text-align: center;
+}
+#matchesTable tbody tr:nth-child(even) {
+  background-color: #1a1a1a;
+}
+#matchesTable tbody tr:nth-child(odd) {
+  background-color: #1f1f1f;
+}
+#matchesTable td {
+  color: #e0e0e0;
+}
+#matchesTable th {
+  color: #e0e0e0;
+  font-weight: normal;
+}
+
+/* Attribution Leetify */
+.attribution {
+  text-align: center;
+  margin-top: 10px;
+}
+.attribution img.leetify-logo {
+  width: 150px; /* taille du logo Leetify */
+  opacity: 0.8;
+}
+.attribution img.leetify-logo:hover {
+  opacity: 1;
+}
+
+/* Responsivité : pour écrans très petits, on ajuste la flexbox des stats */
+@media (max-width: 500px) {
+  .stat {
+    flex: 1 1 100%;
+  }
 }
