@@ -1,180 +1,115 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vinikk CS2 Tracker — Connexion</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-  :root {
-    --bg: #1b1c1e;
-    --panel: #2a2b2e;
-    --text: #ececec;
-    --accent: #ffd369;
-    --accent2: #dc582a;
-  }
-  body {
-    background-color: var(--bg);
-    color: var(--text);
-    font-family: 'Poppins', sans-serif;
-  }
-  .card {
-    background: var(--panel);
-    border-radius: 16px;
-    box-shadow: 0 4px 14px rgba(0,0,0,.4);
-  }
-  input {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    color: var(--text);
-    padding: .6rem .8rem;
-    width: 100%;
-  }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vinikk CS2 Tracker</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Basic font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Local stylesheet -->
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="min-h-screen flex items-center justify-center p-6">
+<body>
+  <main class="container">
+    <!-- Setup form -->
+    <section id="setup" class="card">
+      <h1>Vinikk CS2 Tracker</h1>
+      <p class="muted">Renseigne les identifiants (SteamID64 = Leetify ID). Laisse la clé Steam vide si tu n'en as pas.</p>
 
-<!-- Formulaire de connexion -->
-<div id="setupForm" class="card p-8 max-w-md w-full space-y-5">
-  <h1 class="text-2xl font-bold text-center mb-2">
-    🎯 <span class="text-[var(--accent)]">Vinikk</span> CS2 Tracker
-  </h1>
-  <p class="text-sm opacity-70 text-center">Entrez vos informations pour récupérer vos statistiques.</p>
+      <label>SteamID64 (ex: 7656119...)</label>
+      <input id="steamId" placeholder="7656119xxxxxxxxxx" />
 
-  <div class="space-y-2">
-    <label for="steamId">SteamID64</label>
-    <input type="text" id="steamId" placeholder="7656119xxxxxxxxxx" />
-  </div>
-  <div class="space-y-2">
-    <label for="leetifyId">Identifiant Leetify (même que SteamID64)</label>
-    <input type="text" id="leetifyId" placeholder="7656119xxxxxxxxxx" />
-  </div>
-  <div class="space-y-2">
-    <label for="steamKey">Clé API Steam (facultative)</label>
-    <input type="password" id="steamKey" placeholder="Laissez vide si vous n’en avez pas" />
-  </div>
+      <label>Leetify ID (généralement ton même SteamID64)</label>
+      <input id="leetifyId" placeholder="7656119xxxxxxxxxx" />
 
-  <button id="connectBtn" class="bg-[var(--accent)] text-black font-semibold py-2 w-full rounded-lg hover:brightness-110">
-    Se connecter
-  </button>
+      <label>Steam Web API Key (facultatif — requis pour certaines infos)</label>
+      <input id="steamKey" placeholder="STEAM_API_KEY" type="password" />
 
-  <p class="text-xs text-center opacity-70 mt-4">
-    Les données proviennent des APIs publiques de Steam et Leetify.<br>
-    Aucune information n’est stockée.
-  </p>
-</div>
-
-<!-- Tableau de bord -->
-<div id="dashboard" class="hidden w-full max-w-6xl mx-auto space-y-6">
-  <header class="flex items-center justify-between p-4 card mt-8">
-    <div class="flex items-center gap-3">
-      <img id="avatar" src="" alt="avatar" class="w-14 h-14 rounded-lg border border-white/10">
-      <div>
-        <h2 id="playerName" class="text-xl font-semibold">Profil</h2>
-        <p id="playerRank" class="text-sm opacity-80">Chargement...</p>
+      <div class="row">
+        <label class="row-inline">
+          <input id="useProxy" type="checkbox" />
+          Utiliser proxy CORS (test local)
+        </label>
+        <button id="connectBtn" class="btn primary">Se connecter & charger</button>
       </div>
-    </div>
-    <button id="backBtn" class="bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20">🔙 Retour</button>
-  </header>
 
-  <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <div class="card p-4 text-center"><h3>KD Ratio</h3><p id="kd" class="text-2xl font-bold text-[var(--accent)]">--</p></div>
-    <div class="card p-4 text-center"><h3>Winrate</h3><p id="win" class="text-2xl font-bold text-[var(--accent)]">--</p></div>
-    <div class="card p-4 text-center"><h3>Headshot %</h3><p id="hs" class="text-2xl font-bold text-[var(--accent)]">--</p></div>
-    <div class="card p-4 text-center"><h3>Heures</h3><p id="playtime" class="text-2xl font-bold text-[var(--accent)]">--</p></div>
-  </section>
+      <div class="muted small" id="status">Aucune connexion</div>
+    </section>
 
-  <section class="card p-4">
-    <h3 class="font-semibold mb-3">Derniers matchs</h3>
-    <table class="min-w-full text-sm" id="matchesTable">
-      <thead class="opacity-70 border-b border-white/10">
-        <tr><th>Date</th><th>Map</th><th>Kills</th><th>Deaths</th><th>KD</th><th>Résultat</th></tr>
-      </thead>
-      <tbody id="matchesBody"></tbody>
-    </table>
-  </section>
-</div>
+    <!-- Dashboard -->
+    <section id="dashboard" class="card hidden">
+      <header class="header-row">
+        <div class="profile">
+          <img id="avatar" alt="avatar" />
+          <div>
+            <div id="playerName" class="title">Chargement...</div>
+            <div id="playerSub" class="muted">—</div>
+          </div>
+        </div>
 
-<script>
-const form = document.getElementById('setupForm');
-const dashboard = document.getElementById('dashboard');
-const connectBtn = document.getElementById('connectBtn');
-const backBtn = document.getElementById('backBtn');
+        <div>
+          <button id="backBtn" class="btn">🔙 Déconnexion</button>
+        </div>
+      </header>
 
-connectBtn.addEventListener('click', async () => {
-  const steamId = document.getElementById('steamId').value.trim();
-  const leetifyId = document.getElementById('leetifyId').value.trim();
-  const steamKey = document.getElementById('steamKey').value.trim();
+      <!-- metrics -->
+      <div class="metrics">
+        <div class="metric card">
+          <div class="metric-title">KD Ratio</div>
+          <div id="m-kd" class="metric-value">--</div>
+        </div>
+        <div class="metric card">
+          <div class="metric-title">Winrate</div>
+          <div id="m-win" class="metric-value">--</div>
+        </div>
+        <div class="metric card">
+          <div class="metric-title">Headshot %</div>
+          <div id="m-hs" class="metric-value">--</div>
+        </div>
+        <div class="metric card">
+          <div class="metric-title">Temps jeu</div>
+          <div id="m-hours" class="metric-value">--</div>
+        </div>
+      </div>
 
-  if (!steamId || !leetifyId) {
-    alert('Merci de renseigner au moins le SteamID64 et l’ID Leetify.');
-    return;
-  }
+      <!-- charts -->
+      <div class="grid-2">
+        <div class="card">
+          <h3>Performance radar</h3>
+          <canvas id="radarChart"></canvas>
+        </div>
+        <div class="card">
+          <h3>Winrate par map</h3>
+          <canvas id="mapChart"></canvas>
+        </div>
+      </div>
 
-  form.classList.add('hidden');
-  dashboard.classList.remove('hidden');
-  document.getElementById('playerName').textContent = 'Chargement...';
+      <!-- weapons -->
+      <div class="card">
+        <h3>Armes favorites</h3>
+        <div id="weapons" class="weapons-grid"></div>
+      </div>
 
-  // Steam (facultatif)
-  if (steamKey) {
-    try {
-      const url = `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${steamKey}&steamids=${steamId}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      const player = data.response.players[0];
-      if (player) {
-        document.getElementById('avatar').src = player.avatarfull;
-        document.getElementById('playerName').textContent = player.personaname;
-        document.getElementById('playerRank').textContent = player.loccountrycode || 'Profil Steam';
-      }
-    } catch(e) {
-      console.warn('Erreur Steam:', e);
-    }
-  }
+      <!-- matches -->
+      <div class="card">
+        <h3>Matchs récents</h3>
+        <table id="matchesTable">
+          <thead>
+            <tr><th>Date</th><th>Map</th><th>Score</th><th>K</th><th>D</th><th>KD</th><th>Résultat</th><th>Voir</th></tr>
+          </thead>
+          <tbody id="matchesBody"></tbody>
+        </table>
+      </div>
 
-  // Leetify (public API)
-  try {
-    const res = await fetch(`https://api-public.cs-prod.leetify.com/player/${leetifyId}`);
-    const data = await res.json();
+      <footer class="muted small">Données provenant de Leetify (public API) et Steam (si clé fournie).</footer>
+    </section>
+  </main>
 
-    document.getElementById('kd').textContent = (data.kd ?? '--');
-    document.getElementById('win').textContent = (data.winRate ? data.winRate + '%' : '--');
-    document.getElementById('hs').textContent = (data.headshotPct ? data.headshotPct + '%' : '--');
-    document.getElementById('playtime').textContent = (data.totalPlaytimeHours ? data.totalPlaytimeHours + ' h' : '--');
-  } catch(e) {
-    console.warn('Erreur Leetify:', e);
-  }
-
-  // Récup matchs récents
-  try {
-    const res = await fetch(`https://api-public.cs-prod.leetify.com/matches/recent/${leetifyId}`);
-    const matches = await res.json();
-    const body = document.getElementById('matchesBody');
-    body.innerHTML = '';
-    matches.forEach(m => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${new Date(m.date).toLocaleDateString()}</td>
-        <td>${m.mapName}</td>
-        <td>${m.kills}</td>
-        <td>${m.deaths}</td>
-        <td>${(m.kills/m.deaths).toFixed(2)}</td>
-        <td>${m.result === 'win' ? '✅' : '❌'}</td>
-      `;
-      body.appendChild(tr);
-    });
-  } catch(e) {
-    console.warn('Erreur matchs Leetify:', e);
-  }
-});
-
-backBtn.addEventListener('click', () => {
-  dashboard.classList.add('hidden');
-  form.classList.remove('hidden');
-});
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
